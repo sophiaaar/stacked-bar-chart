@@ -1,0 +1,12 @@
+.axis .domain {
+  display: none;
+}
+
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 1.5em;
+}
