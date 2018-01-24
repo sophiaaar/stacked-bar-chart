@@ -2,17 +2,17 @@ var d3;
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
+    height = +svg.attr("height") - margin.left - margin.right,
+    width = +svg.attr("width") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var x = d3.scaleBand()
-    .rangeRound([0, width])
+var y = d3.scaleBand()
+    .rangeRound([0, height])
     .paddingInner(0.05)
     .align(0.1);
 
-var y = d3.scaleLinear()
-    .rangeRound([height, 0]);
+var x = d3.scaleLinear()
+    .rangeRound([0, width]);
 
 var z = d3.scaleOrdinal()
     .range(["#50c978", "#bc4966", "#7e5da3", "#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
@@ -28,8 +28,8 @@ d3.csv("data.csv", function(d, i, columns) {
   var keys = data.columns.slice(1);
 
   data.sort(function(a, b) { return b.total - a.total; });
-  x.domain(data.map(function(d) { return d.Milestone; }));
-  y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+  y.domain(data.map(function(d) { return d.Milestone; }));
+  x.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
   z.domain(keys);
 
   g.append("g")
@@ -40,10 +40,10 @@ d3.csv("data.csv", function(d, i, columns) {
     .selectAll("rect")
     .data(function(d) { return d; })
     .enter().append("rect")
-      .attr("x", function(d) { return x(d.data.Milestone); })
-      .attr("y", function(d) { return y(d[1]); })
-      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-      .attr("width", x.bandwidth());
+      .attr("y", function(d) { return y(d.data.Milestone); })
+      .attr("x", function(d) { return x(d[0]); })
+      .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+      .attr("height", y.bandwidth());
 
   g.append("g")
       .attr("class", "axis")
@@ -54,9 +54,9 @@ d3.csv("data.csv", function(d, i, columns) {
       .attr("class", "axis")
       .call(d3.axisLeft(y).ticks(null, "s"))
     .append("text")
-      .attr("x", 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "0.32em")
+      .attr("y", 2)
+      .attr("x", y(y.ticks().pop()) + 0.5)
+      .attr("dx", "0.32em")
       .attr("fill", "#000")
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
@@ -72,14 +72,14 @@ d3.csv("data.csv", function(d, i, columns) {
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 19)
+      .attr("x", width)
       .attr("width", 19)
       .attr("height", 19)
       .attr("fill", z);
 
   legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9.5)
+      .attr("x", width)
+      .attr("y", 5)
       .attr("dy", "0.32em")
       .text(function(d) { return d; });
   
